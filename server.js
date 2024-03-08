@@ -4,6 +4,7 @@ import cors from 'cors';
 import { connectDB } from "./config/db.js";
 import userRouter from "./Routes/UserRouter.js";
 import { errorHandler } from "./midddleware/errorMiddlewares.js";
+import moviesRouter from "./Routes/MoviesRouter.js";
 //import bodyParser from "body-parser";
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.get("/",(req,res)=>{
 })
 
 app.use("/api/users",userRouter);
+app.use("/api/movies",moviesRouter);
 
 app.use(errorHandler);
 

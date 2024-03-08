@@ -6,4 +6,13 @@ const generateToken =(id =>{
     }
 })
 
-export { generateToken };
+const admin = (req,res,next)=>{
+    if(req.users && req.user.isAdmin){
+        next();
+    }else{
+        res.status(401);
+        throw new Error("not authroized as an admin")
+    }
+};
+
+export { generateToken,admin };

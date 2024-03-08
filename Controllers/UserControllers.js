@@ -17,15 +17,15 @@ import express from "express";
 //             throw new Error("user already exists");
 //         }
 
-//         const salt = await bcrypt.genSalt(10);
-//         const hashedPassword = await bcrypt.hash(password,salt);
+//         //const salt = await bcrypt.genSalt(10);
+//         const hashedPassword = await bcrypt.hash(password, 7);
 
-//         const user =  await User.create({
-//             fullName:fullName,
-//             email:email,
+//         const user =  await UserModel.create({
+//             fullName,
+//             email,
 //             password:hashedPassword,
-//             image:image,
-//         })
+//             image,
+//         });
 
 //         if(user){
 //             res.status(201).json({
@@ -34,7 +34,7 @@ import express from "express";
 //                 email:user.email,
 //                 image:user.image,
 //                 isAdmin:user.isAdmin,
-//                 token:generateToken(user_id),
+//                 //token:generateToken(user_id),
 
 //             });
 //         }else{
@@ -47,7 +47,8 @@ import express from "express";
 // })
 
  export const registerUser = async (req, res) => {
-    console.log(req.body)
+     
+    console.log(req.body,"hi")
     const { fullName,email, password, image } = req.body;
     
     try {
@@ -64,6 +65,8 @@ import express from "express";
         email :email, 
         password: hashedPassword, 
         image :image,
+        //isAdmin:isAdmin,
+        //token:generateToken(id),
         });
   
         // yaha pe hasing krenge
@@ -79,28 +82,28 @@ import express from "express";
     }
   };
 
-//   export const loginUser = asyncHandler(async(req,res)=>{
-//      const {email, password} = req.body;
-//      try{
-//         const user = await User.findOne({email});
-//         if(user &&(await bcrypt.compare(password,user.password))){
-//             res.json({
-//                 _id:user_id,
-//                 fullName:user.fullName,
-//                 email:user.email,
-//                 image:user.image,
-//                 isAdmin:user.isAdmin,
-//                 token:generateToken(user_id),
-//             })
-//         } else{
-//             res.status(401);
-//             throw new Error("invalid email or passoword")
-//         }
+  // export const loginUser = asyncHandler(async(req,res)=>{
+  //    const {email, password} = req.body;
+  //    try{
+  //       const user = await User.findOne({email});
+  //       if(user &&(await bcrypt.compare(password,user.password))){
+  //           res.json({
+  //               _id:user_id,
+  //               fullName:user.fullName,
+  //               email:user.email,
+  //               image:user.image,
+  //               isAdmin:user.isAdmin,
+  //               token:generateToken(user_id),
+  //           })
+  //       } else{
+  //           res.status(401);
+  //           throw new Error("invalid email or passoword")
+  //       }
 
-//      } catch(error){
-//         res.status(400).json({message:error.me})
-//      }
-//   })
+  //    } catch(error){
+  //       res.status(400).json({message:error.me})
+  //    }
+  // })
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
   
@@ -159,4 +162,48 @@ export const changeUserPassword = asyncHandler(async(req,res)=>{
         res.status(400).json({message:error.message})
     }
 });
+
+
+export const getLikedMovies =asyncHandler(async(req,res) =>{
+  try{
+    const user = await UserModel.findById(req._id).populate("likedMovies");
+    if(user){
+      res.status(400);
+      throw new Error("User not found");
+    }
+  }catch(error){
+    res.status(400).json({message:error.message})
+  }
+});
+
+export const addLikedMovie = asyncHandler(async(req,res)=>{
+  const {movieId}  = req.body;
+  try{
+    const user = await UserModel.findById(req._id)
+    if(user){
+      if(user.likedMovies.includes(movieId)){
+        res.status(400);
+        throw new Error("Movie already liked");
+      }
+      user.likedMovies.push(movieId);
+      await user.save();
+      res.json(user.likedMovies)
+    }
+    else{
+      res.status(404);
+      throw new Error("User not found")
+    }
+  } catch(error){
+    res.status(400).json({message:error.message})
+  }
+})
+
+export const getUsers =asyncHandler(async(req,res)=>{
+try{
+ const users = await User.find({});
+ res.json(users)
+} catch(error){
+  res.status(400).json("message:error.message");
+}
+})
 
